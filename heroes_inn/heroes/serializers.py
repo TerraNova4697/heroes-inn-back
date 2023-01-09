@@ -15,8 +15,8 @@ class WeaponSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+# Сериализатор персонажа
 class HeroSerializer(serializers.ModelSerializer):
-    # weapons = WeaponSerializer(many=True)
 
     def validate_level(self, value):
         if not 1 <= value <= 20:
@@ -68,6 +68,8 @@ class HeroSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+# Сериализатор персонажа + его оружия.
+# Используется в GET запросах конкретного персонажа
 class HeroWeaponSerializer(serializers.ModelSerializer):
     weapons = WeaponSerializer(many=True)
 

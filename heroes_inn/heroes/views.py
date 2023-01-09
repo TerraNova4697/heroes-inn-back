@@ -11,9 +11,7 @@ from .models import Hero, Weapon
 from .serializers import HeroesSerializer, HeroSerializer, WeaponSerializer, HeroWeaponSerializer
 
 
-# Create your views here.
-
-
+# GET-запрос списка персонажей конкретного пользователя
 class HeroesAPIView(generics.ListAPIView):
     serializer_class = HeroesSerializer
     permission_classes = (IsAuthenticated, )
@@ -23,20 +21,20 @@ class HeroesAPIView(generics.ListAPIView):
         return Hero.objects.filter(owner=user.id)
 
 
+# GET-запрос списка всего оружия
 class WeaponsAPIView(generics.ListAPIView):
     serializer_class = WeaponSerializer
     queryset = Weapon.objects.all()
 
 
+# POST-запрос создания персонажа
 class HeroCreateAPIView(generics.CreateAPIView):
     queryset = Hero.objects.all()
     serializer_class = HeroSerializer
     permission_classes = (IsAuthenticated, )
 
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
 
-
+# POST-запрос персонажа
 class HeroRetrieveAPIView(generics.RetrieveAPIView):
     queryset = Hero.objects.prefetch_related('weapons').all()
     serializer_class = HeroWeaponSerializer
@@ -45,11 +43,15 @@ class HeroRetrieveAPIView(generics.RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
+
+        # Здесь выполняется проверка соответствия владельца персонажа. В случае провала проверки отправляется ошибка 403
         if instance.owner.id != request.user.id:
             raise PermissionDenied(detail="Упс! Похоже это персонаж другого игрока.", code=HTTP_403_FORBIDDEN)
+
         return Response(serializer.data)
 
 
+# PATCH-запрос на частичное обновление персонажа.
 class HeroUpdateAPIView(generics.UpdateAPIView):
     queryset = Hero.objects.prefetch_related('weapons').all()
     serializer_class = HeroSerializer
@@ -59,6 +61,7 @@ class HeroUpdateAPIView(generics.UpdateAPIView):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
 
+        # Также выполняется проверка соответствия владельца персонажа
         if instance.owner.id != request.user.id:
             raise PermissionDenied(detail="Упс! Похоже это персонаж другого игрока.", code=HTTP_403_FORBIDDEN)
 
@@ -74,6 +77,7 @@ class HeroUpdateAPIView(generics.UpdateAPIView):
         return Response(serializer.data)
 
 
+# DELETE-запрос на удаление персонажа
 class HeroDeleteAPIView(generics.DestroyAPIView):
     queryset = Hero.objects.all()
     serializer_class = HeroSerializer
@@ -82,6 +86,7 @@ class HeroDeleteAPIView(generics.DestroyAPIView):
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
 
+        # Также выполняется проверка соответствия владельца персонажа
         if instance.owner.id != request.user.id:
             raise PermissionDenied(detail="Упс! Похоже это персонаж другого игрока.", code=HTTP_403_FORBIDDEN)
 
@@ -94,6 +99,7 @@ class HeroDeleteAPIView(generics.DestroyAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+# В случае обновления изображения персонажа удаляется старое изображение
 @api_view(['POST'])
 def image_view(request):
     if request.method == 'POST':
