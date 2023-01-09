@@ -1,5 +1,4 @@
 from rest_framework import generics, status
-from django.views.generic import ListView
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
