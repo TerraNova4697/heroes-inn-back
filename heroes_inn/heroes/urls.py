@@ -1,11 +1,10 @@
 from django.urls import path, include
-from .views import (HeroesListView, HeroesAPIView, HeroCreateAPIView, HeroUpdateAPIView, WeaponsAPIView, image_view,
+from .views import (HeroesAPIView, HeroCreateAPIView, HeroUpdateAPIView, WeaponsAPIView, image_view,
                     HeroDeleteAPIView, HeroRetrieveAPIView)
 
 app_name = 'heroes'
 
 urlpatterns = [
-    path('', HeroesListView.as_view(), name='heroes_list'),
     path('api/v1/heroeslist/', HeroesAPIView.as_view()),
     path('api/v1/createhero/', HeroCreateAPIView.as_view()),
     path('api/v1/deletehero/<int:pk>', HeroDeleteAPIView.as_view()),

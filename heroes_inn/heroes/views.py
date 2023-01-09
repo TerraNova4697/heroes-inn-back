@@ -14,20 +14,6 @@ from .serializers import HeroesSerializer, HeroSerializer, WeaponSerializer, Her
 
 # Create your views here.
 
-class HeroesListView(ListView):
-    template_name = 'heroes/heroes_list.html'
-    context_object_name = 'heroes_list'
-    model = Hero
-    # queryset = Hero.objects.get(owner=self.request.user)
-
-    def get_queryset(self):
-        queryset = Hero.objects.filter(owner=self.request.user.id)
-        return queryset
-
-    # def get_context_data(self, *, object_list=None, **kwargs):
-    #     print(self.request.user)
-    #     return super().get_context_data()
-
 
 class HeroesAPIView(generics.ListAPIView):
     serializer_class = HeroesSerializer
