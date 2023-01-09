@@ -22,8 +22,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', HomeView.as_view(), name='home-page'),
-    path('user/', include('user.urls')),
+    # path('', HomeView.as_view(), name='home-page'),
     path('heroes/', include('heroes.urls')),
     re_path(r'^auth/', include('djoser.urls')),
     re_path(r'^auth/', include('djoser.urls.authtoken')),
