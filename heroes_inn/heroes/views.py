@@ -65,6 +65,13 @@ class HeroUpdateAPIView(generics.UpdateAPIView):
         if instance.owner.id != request.user.id:
             raise PermissionDenied(detail="Упс! Похоже это персонаж другого игрока.", code=HTTP_403_FORBIDDEN)
 
+        # Если есть старое изображение и если оно не дефолтное, то удаляем его
+        hero = Hero.objects.filter(pk=instance.id).get()
+        if hero.hero_img is not '':
+            old_image_name = hero.hero_img.split('/')[-1]
+            if default_storage.exists(old_image_name) and old_image_name != 'default-hero-image.jpg':
+                default_storage.delete(old_image_name)
+
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
@@ -91,9 +98,10 @@ class HeroDeleteAPIView(generics.DestroyAPIView):
             raise PermissionDenied(detail="Упс! Похоже это персонаж другого игрока.", code=HTTP_403_FORBIDDEN)
 
         # Перед удалением записи в БД, удалить изображение персонажа если это не дефолтное изображение
-        image_name = instance.hero_img.split('/')[-1]
-        if default_storage.exists(image_name) and image_name != 'default-hero-image.jpg':
-            default_storage.delete(image_name)
+        if instance.hero_img != '':
+            image_name = instance.hero_img.split('/')[-1]
+            if default_storage.exists(image_name) and image_name != 'default-hero-image.jpg':
+                default_storage.delete(image_name)
 
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -108,10 +116,10 @@ def image_view(request):
         # 1. Файл изображения
         # 2. Путь к старому изображению
         image = request.FILES['image']
-        old_image = request.data['old_image']
+        old_image = request.data.get('old_image')
 
         # Проверяем есть ли старое изображение. Если есть, то удаляем его
-        if old_image:
+        if old_image is not None:
             old_image_name = old_image.split('/')[-1]
             if default_storage.exists(old_image_name) and old_image_name != 'default-hero-image.jpg':
                 default_storage.delete(old_image_name)
