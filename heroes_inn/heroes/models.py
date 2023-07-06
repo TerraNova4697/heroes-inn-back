@@ -1,27 +1,14 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-# Create your models here.
-
-
-class Weapon(models.Model):
-    name = models.CharField(max_length=200, verbose_name='Название')
-    price = models.CharField(max_length=255, verbose_name='Цена')
-    damage = models.CharField(max_length=200, verbose_name='Урон')
-    type_of_damage = models.CharField(max_length=200, verbose_name='Тип урона')
-    other_properties = models.TextField(blank=True, verbose_name='Различные свойства')
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = 'Оружие'
-        verbose_name_plural = "Оружие"
-
 
 class Hero(models.Model):
-    owner = models.ForeignKey(to=get_user_model(), on_delete=models.CASCADE)
-    hero_img = models.CharField(blank=True, null=True, default="", max_length=255)
+    pass
+
+
+class Character(models.Model):
+    user = models.ForeignKey(to=get_user_model(), on_delete=models.CASCADE)
+    char_img = models.CharField(blank=True, null=True, default="", max_length=255)
     name = models.CharField(max_length=200, blank=True)
     heroes_class = models.CharField(max_length=200, blank=True)
     background = models.CharField(max_length=200, blank=True)
@@ -30,7 +17,7 @@ class Hero(models.Model):
     exp_points = models.IntegerField(blank=True, null=True)
     level = models.IntegerField(blank=True, null=True)
     inspiration = models.BooleanField(default=False)
-    proficiency_bonus = models.IntegerField(blank=True, null=True)
+    prof_bonus = models.IntegerField(blank=True, null=True)
     armor_class = models.CharField(max_length=10, blank=True)
     initiative = models.IntegerField(blank=True, null=True)
     speed = models.IntegerField(blank=True, null=True)
@@ -38,22 +25,87 @@ class Hero(models.Model):
     max_hit_points = models.IntegerField(blank=True, null=True)
     temporary_hit_points = models.IntegerField(blank=True, null=True)
     hit_dice = models.CharField(blank=True, null=True, default="", max_length=20)
-    death_saves_successes = models.IntegerField(blank=True, null=True)
-    death_saves_failures = models.IntegerField(blank=True, null=True)
-    other_profs_and_languages = models.TextField(blank=True)
+    death_successes = models.IntegerField(blank=True, null=True)
+    death_failures = models.IntegerField(blank=True, null=True)
+    other_profs_and_langs = models.TextField(blank=True)
     passive_wisdom = models.IntegerField(blank=True, null=True)
-    weapons = models.ManyToManyField(Weapon, blank=True)
-    attacks_and_spellcasting = models.TextField(blank=True)
-    equipment = models.TextField(blank=True)
-    features_and_traits = models.TextField(blank=True)
-    # Modification
+    weapons = models.ManyToManyField('Weapon', blank=True)
+    attacks_and_spellcasting = models.ManyToManyField('Spell', blank=True)
+    equipment = models.ManyToManyField('Item', blank=True)
+    features_and_traits = models.ManyToManyField('Feature', blank=True)
+    modifications_set = models.OneToOneField('ModificationSet', null=True, on_delete=models.SET_NULL)
+    saving_throws_set = models.OneToOneField('SavingThrowsSet', null=True, on_delete=models.SET_NULL)
+    skills_set = models.OneToOneField('CharacterSkills', null=True, on_delete=models.SET_NULL)
+    char_views = models.OneToOneField('CharacterViewsSet', null=True, on_delete=models.SET_NULL)
+    char_money = models.OneToOneField('CharacterMoney', null=True, on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def image_url(self):
+        if self.hero_img and hasattr(self.hero_img, 'url'):
+            return self.hero_img.url
+
+
+class Weapon(models.Model):
+    name = models.CharField(max_length=200, verbose_name='Name')
+    weapon_type = models.CharField(max_length=32, verbose_name='Weapon Type', default='Uncategorized')
+    rarity = models.CharField(max_length=32, verbose_name='Rarity', default='Uncategorized')
+    weigth = models.IntegerField(default=-1)
+    weapon_category = models.CharField(max_length=32, default='Uncategorized')
+    weapon_range = models.CharField(max_length=32, default=-1)
+    dmg_type = models.CharField(max_length=32, default="Uncategorized")
+    dmg1 = models.CharField(max_length=32, default='-1')
+    dmg2 = models.CharField(max_length=32, default='-1')
+    bonus_weapon = models.CharField(max_length=32, default='-1')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Weapon'
+        verbose_name_plural = "Weapon"
+
+
+class Spell(models.Model):
+    name = models.CharField(max_length=200, verbose_name='Название')
+    level = models.IntegerField(default=-1)
+    source = models.CharField(max_length=255, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Item(models.Model):
+    name = models.CharField(max_length=200, verbose_name='Название')
+    source = models.CharField(max_length=255, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Feature(models.Model):
+    name = models.CharField(max_length=200, verbose_name='Название')
+    source = models.CharField(max_length=255, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+class ModificationSet(models.Model):
     strength = models.IntegerField(blank=True, null=True)
     dexterity = models.IntegerField(blank=True, null=True)
     constitution = models.IntegerField(blank=True, null=True)
     intelligence = models.IntegerField(blank=True, null=True)
     wisdom = models.IntegerField(blank=True, null=True)
     charisma = models.IntegerField(blank=True, null=True)
-    # Saving throws
+
+    def __str__(self):
+        return 'Set of character modifications'
+
+
+class SavingThrowsSet(models.Model):
     strength_sb_active = models.BooleanField(default=False)
     strength_sb = models.IntegerField(blank=True, null=True)
     dexterity_sb_active = models.BooleanField(default=False)
@@ -66,7 +118,12 @@ class Hero(models.Model):
     wisdom_sb = models.IntegerField(blank=True, null=True)
     charisma_sb_active = models.BooleanField(default=False)
     charisma_sb = models.IntegerField(blank=True, null=True)
-    # Skills
+
+    def __str__(self):
+        return 'Set of character saving throws'
+
+
+class CharacterSkills(models.Model):
     acrobatics_active = models.BooleanField(default=False)
     acrobatics = models.IntegerField(blank=True, null=True)
     anim_handling_active = models.BooleanField(default=False)
@@ -103,12 +160,22 @@ class Hero(models.Model):
     stealth = models.IntegerField(blank=True, null=True)
     survival_active = models.BooleanField(default=False)
     survival = models.IntegerField(blank=True, null=True)
-    # Characters views
+
+    def __str__(self):
+        return 'Set of character skills'
+
+
+class CharacterViewsSet(models.Model):
     personality_traits = models.TextField(blank=True)
     ideals = models.TextField(blank=True)
     bonds = models.TextField(blank=True)
     flaws = models.TextField(blank=True)
-    # Money
+
+    def __str__(self):
+        return 'Set of character views'
+
+
+class CharacterMoney(models.Model):
     gold_coins = models.IntegerField(blank=True, null=True)
     silver_coins = models.IntegerField(blank=True, null=True)
     copper_coins = models.IntegerField(blank=True, null=True)
@@ -116,13 +183,4 @@ class Hero(models.Model):
     platinum_coins = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
-        return self.name
-
-    @property
-    def image_url(self):
-        if self.hero_img and hasattr(self.hero_img, 'url'):
-            return self.hero_img.url
-
-    class Meta:
-        verbose_name = 'Герой'
-        verbose_name_plural = "Герои"
+        return f' {self.gold_coins} {self.silver_coins} {self.copper_coins} {self.electron_coins} {self.platinum_coins}'
