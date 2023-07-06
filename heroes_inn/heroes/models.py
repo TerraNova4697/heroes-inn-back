@@ -126,6 +126,3 @@ class Hero(models.Model):
     class Meta:
         verbose_name = 'Герой'
         verbose_name_plural = "Герои"
-
-
-
