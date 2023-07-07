@@ -49,12 +49,12 @@ class Character(models.Model):
 
 
 class Weapon(models.Model):
-    name = models.CharField(max_length=200, verbose_name='Name')
+    name = models.CharField(max_length=200, verbose_name='Name', unique=True)
     weapon_type = models.CharField(max_length=32, verbose_name='Weapon Type', default='Uncategorized')
     rarity = models.CharField(max_length=32, verbose_name='Rarity', default='Uncategorized')
-    weigth = models.IntegerField(default=-1)
+    weight = models.IntegerField(default=-1)
     weapon_category = models.CharField(max_length=32, default='Uncategorized')
-    weapon_range = models.CharField(max_length=32, default=-1)
+    weapon_range = models.CharField(max_length=32, default='0')
     dmg_type = models.CharField(max_length=32, default="Uncategorized")
     dmg1 = models.CharField(max_length=32, default='-1')
     dmg2 = models.CharField(max_length=32, default='-1')
@@ -69,7 +69,7 @@ class Weapon(models.Model):
 
 
 class Spell(models.Model):
-    name = models.CharField(max_length=200, verbose_name='Название')
+    name = models.CharField(max_length=200, verbose_name='Spell', unique=True)
     level = models.IntegerField(default=-1)
     source = models.CharField(max_length=255, null=True, blank=True)
 
@@ -78,7 +78,7 @@ class Spell(models.Model):
 
 
 class Item(models.Model):
-    name = models.CharField(max_length=200, verbose_name='Название')
+    name = models.CharField(max_length=200, verbose_name='Item', unique=True)
     source = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
@@ -86,7 +86,7 @@ class Item(models.Model):
 
 
 class Feature(models.Model):
-    name = models.CharField(max_length=200, verbose_name='Название')
+    name = models.CharField(max_length=200, verbose_name='Feature', unique=True)
     source = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):

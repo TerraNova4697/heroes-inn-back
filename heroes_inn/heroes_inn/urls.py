@@ -17,11 +17,12 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
-from .views import HomeView
+# from .views import home_view
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    # path('', home_view, name='home'),
     path('admin/', admin.site.urls),
     path('heroes/', include('heroes.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
