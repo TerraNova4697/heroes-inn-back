@@ -1,9 +1,9 @@
 # import json
 # import os
 
-from django.db import transaction
+# from django.db import transaction
 # from django.conf import settings
-from django.http import HttpResponse
+# from django.http import HttpResponse
 
 # from heroes.models import (
 #     Weapon,
@@ -11,13 +11,13 @@ from django.http import HttpResponse
 #     Item,
 #     Feature,
 # )
-from django.urls import reverse
+# from django.urls import reverse
 
 
-@transaction.atomic
-def home_view(request):
-    CHAR_URL = reverse('inn:character-list')
-    print('URLS::::::', CHAR_URL)
+# @transaction.atomic
+# def home_view(request):
+#     CHAR_URL = reverse('inn:character-list')
+#     print('URLS::::::', CHAR_URL)
 #     """Prepopulate DB."""
 
 #     """Prepopulate with Weapons and Items."""
@@ -81,4 +81,4 @@ def home_view(request):
 #                     name=feat['name']
 #                 )
 
-    return HttpResponse(CHAR_URL)
+#     return HttpResponse(CHAR_URL)
