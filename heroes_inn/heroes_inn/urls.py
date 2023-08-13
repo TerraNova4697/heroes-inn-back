@@ -21,12 +21,12 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 # from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
-from .views import home_view
+# from .views import home_view
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('', home_view, name='home'),
+    # path('', home_view, name='home'),
     path('admin/', admin.site.urls),
     path('api/v1/', include('heroes.urls')),
     path('api/schema/', SpectacularAPIView.as_view(), name='api-schema'),

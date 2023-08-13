@@ -18,6 +18,7 @@ from .models import (
     Feature
 )
 from heroes import serializers
+from .services.cache import Cache, RedisCache
 
 
 class CharacterViewSet(viewsets.ModelViewSet):
@@ -66,6 +67,7 @@ class CharacterViewSet(viewsets.ModelViewSet):
 )
 class PredefinedItemsViewSet(viewsets.ReadOnlyModelViewSet):
     """View for predefined items."""
+    cache = Cache(RedisCache())
 
     def get_queryset(self):
         """Get filtered queryset."""
@@ -75,6 +77,19 @@ class PredefinedItemsViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = queryset.filter(name__icontains=name)
 
         return queryset.order_by('name')
+
+    def retrieve(self, request, *args, **kwargs):
+        """Retrieve item from Redis Cache if exists. Otherwise get it from the DB and cache it."""
+        name, item_pk = request.path.split('/')[3:5]
+        obj = self.cache.get_item(name, item_pk)
+        if obj:
+            return Response(obj)
+        else:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance)
+            data = serializer.data
+            self.cache.set_item(name, data)
+            return Response(data)
 
 
 class SpellsViewSet(PredefinedItemsViewSet):
